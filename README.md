@@ -1,2 +1,2 @@
 # UnitySerializedDict
- Simple Readonly Serialization for Dictionary
+ Simple Serialization for C# Dictionaries in Unity
