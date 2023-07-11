@@ -318,7 +318,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1305046261}
-  - component: {fileID: 1305046260}
+  - component: {fileID: 1305046262}
   m_Layer: 0
   m_Name: GameObject with Dictionary
   m_TagString: Untagged
@@ -326,7 +326,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1305046260
+--- !u!4 &1305046261
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305046259}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1305046262
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -346,14 +361,21 @@ MonoBehaviour:
     - stringvalue
     - stringvalue2
     selectionType: 1
-    showCollectionSize: 0
+    isReadonly: 0
   dictionaryStringStringList:
     keyData:
     - stringkey
     - stringkey2
-    valueData: []
+    valueData:
+    - list:
+      - value1
+      - value2
+    - list:
+      - value1
+      - value2
+      - value3
     selectionType: 2
-    showCollectionSize: 0
+    isReadonly: 0
   dictionaryIntString:
     keyData: 0a000000ffffffff00000000
     valueData:
@@ -361,25 +383,11 @@ MonoBehaviour:
     - value2
     - value3
     selectionType: 0
-    showCollectionSize: 0
+    isReadonly: 0
   dictionaryStringIntList:
     keyData:
     - stringkey
-    valueData: []
+    valueData:
+    - list: 00000000010000000900000005000000
     selectionType: 0
-    showCollectionSize: 0
---- !u!4 &1305046261
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1305046259}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+    isReadonly: 0

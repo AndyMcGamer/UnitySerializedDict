@@ -16,7 +16,7 @@ namespace AndyL.Serialization
 
         // Property Drawer Vars
         public SelectionType selectionType = SelectionType.None;
-        public bool showCollectionSize = false;
+        public bool isReadonly = false;
 
         public void OnAfterDeserialize()
         {
@@ -41,5 +41,8 @@ namespace AndyL.Serialization
     }
 
     [Serializable]
-    public class SerializedList<T> : List<T> { }
+    public class SerializedList<T> 
+    {
+        public List<T> list = new();
+    }
 }

@@ -11,7 +11,9 @@ namespace AndyL.Serialization
 {
     public class SerializedDictionaryDrawer<TKey, TValue> : PropertyDrawer
     {
-        UnityEngine.Object target;
+        private UnityEngine.Object target;
+        private List<TKey> keys;
+
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             var root = new VisualElement();
@@ -19,9 +21,7 @@ namespace AndyL.Serialization
             SerializedProperty keyProperty = property.FindPropertyRelative("keyData").Copy();
             SerializedProperty valueProperty = property.FindPropertyRelative("valueData").Copy();
 
-            var keyData = keyProperty.GetSerializedValue<List<TKey>>();
-            var valueData = valueProperty.GetSerializedValue<List<TValue>>();
-
+            keys = keyProperty.GetSerializedValue<List<TKey>>();
 
             SerializedProperty iterator = property.Copy();
             iterator.Next(true);
@@ -42,7 +42,6 @@ namespace AndyL.Serialization
                 Selection.activeObject = null;
                 EditorApplication.delayCall += OnDelayedCall;
             });
-
             root.Add(hiddenSize);
 
 
@@ -53,49 +52,38 @@ namespace AndyL.Serialization
                 return container;
             };
 
-            List<ListView> keysAndValues = new();
+            List<VisualElement> keysAndValues = new();
 
-            for (int i = 0; i < keyData.Count; i++)
+            for (int i = 0; i < keys.Count; i++)
             {
-                List<object> values = new();
-                if (typeof(TValue).IsGenericType && typeof(TValue).GetGenericTypeDefinition().GetInterfaces().Contains(typeof(IList)))
-                {
-                    var value = valueData[i] as IList;
-                    foreach (var item in value)
-                    {
-                        values.Add(item);
-                    }
-                }
-                else
-                {
-                    values.Add(valueData[i]);
-                }
 
-                ListView valueListView = new()
-                {
-                    itemsSource = values.ToList(),
-                    makeItem = () =>
-                    {
-                        var container = new VisualElement();
-                        container.Add(new Label());
-                        return container;
-                    },
-                    bindItem = (e, i) =>
-                    {
-                        e.Q<Label>().text = values[i].ToString();
-                    },
-                    virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                    selectionType = (SelectionType)property.FindPropertyRelative("selectionType").enumValueIndex,
-                    showFoldoutHeader = true,
-                    showBoundCollectionSize = property.FindPropertyRelative("showCollectionSize").boolValue,
-                    showAlternatingRowBackgrounds = AlternatingRowBackground.All,
-                    showBorder = true,
-                    headerTitle = keyData[i].ToString(),
-                    showAddRemoveFooter = false,
-                };
-                valueListView.style.paddingLeft = 5;
+                SerializedProperty key = keyProperty.Copy();
+                key.Next(true);
+                key = key.GetArrayElementAtIndex(i);
 
-                keysAndValues.Add(valueListView);
+                SerializedProperty value = valueProperty.Copy();
+                value.Next(true);
+                value = value.GetArrayElementAtIndex(i);
+
+                VisualElement keyValuePair = new();
+                var keyPropertyField = new PropertyField(key);
+                keyPropertyField.BindProperty(key);
+                keyPropertyField.label = "Key";
+                keyPropertyField.name = "Key";
+                keyPropertyField.style.flexGrow = 1;
+
+                var valuePropertyField = new PropertyField(value);
+                valuePropertyField.BindProperty(value);
+                valuePropertyField.label = "Value";
+                valuePropertyField.name = "Value";
+                valuePropertyField.style.flexGrow = 1;
+
+                keyValuePair.Add(keyPropertyField);
+                keyValuePair.Add(valuePropertyField);
+
+                keysAndValues.Add(keyValuePair);
+
+
             }
 
 
@@ -115,15 +103,45 @@ namespace AndyL.Serialization
                 showFoldoutHeader = true,
                 headerTitle = property.displayName,
                 showBorder = true,
-                showBoundCollectionSize = property.FindPropertyRelative("showCollectionSize").boolValue,
-                showAddRemoveFooter = false,
+                showBoundCollectionSize = !property.FindPropertyRelative("isReadonly").boolValue,
+                showAddRemoveFooter = !property.FindPropertyRelative("isReadonly").boolValue,
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
             };
-            keyListView.style.minHeight = 50;
+
+            keyListView.itemsRemoved += (items) =>
+            {
+                foreach (var item in items)
+                {
+                    property.GetSerializedValue<Dictionary<TKey, TValue>>().Remove(keys[item]);
+                }
+            };
+
+            if (keyListView.showAddRemoveFooter)
+            {
+                keyListView.Q<Button>("unity-list-view__add-button").clicked += (() =>
+                {
+                    TKey newKey = default;
+                    TValue newValue = default;
+                    
+                    if (newKey is TKey && !property.GetSerializedValue<Dictionary<TKey, TValue>>().ContainsKey(newKey))
+                    {
+                        property.GetSerializedValue<Dictionary<TKey, TValue>>().Add(newKey, newValue);
+                    }
+                    else
+                    {
+                        target = Selection.activeObject;
+                        Selection.activeObject = null;
+                        EditorApplication.delayCall += OnDelayedCall;
+                    }
+
+                });
+            }
+
+
+
+
             root.Add(keyListView);
-
-
             return root;
         }
 
